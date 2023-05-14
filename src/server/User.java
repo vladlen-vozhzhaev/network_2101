@@ -7,8 +7,8 @@ import java.net.Socket;
 
 public class User {
     private Socket socket;
-    private DataOutputStream out;
-    private DataInputStream in;
+    private DataOutputStream out; // Поток вывода
+    private DataInputStream in; // Поток ввода
     private String name;
 
     public User(Socket socket) throws IOException {

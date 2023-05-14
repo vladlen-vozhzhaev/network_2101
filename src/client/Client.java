@@ -1,5 +1,7 @@
 package client;
 
+import org.json.simple.JSONObject;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,8 +33,21 @@ public class Client {
             thread.start();
             Scanner scanner = new Scanner(System.in);
             while (true){
+                /*
+                * Hello
+                * /m Ivan hello
+                * */
                 String msg = scanner.nextLine();
-                out.writeUTF(msg);
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("public", true);
+                if(msg.split(" ")[0].equals("/m")){
+                    String toUser = msg.split(" ")[1];
+                    msg = msg.substring(3+toUser.length()+1);
+                    jsonObject.put("public", false);
+                    jsonObject.put("to_user", toUser);
+                }
+                jsonObject.put("msg", msg);
+                out.writeUTF(jsonObject.toJSONString());
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
