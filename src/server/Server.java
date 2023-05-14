@@ -27,12 +27,15 @@ public class Server {
                     public void run() {
                             String msg = null;
                             try {
+                                out.writeUTF("Введите имя: ");
+                                String name = in.readUTF();
+                                out.writeUTF(name+" добро пожаловать на сервер!");
                                 while (true) {
                                     msg = in.readUTF();
-                                    System.out.println("Клиент прислал сообщение:" + msg);
+                                    System.out.println(name +": "+ msg);
                                     for (Socket userSocket : sockets) {
                                         DataOutputStream userSocketOut = new DataOutputStream(userSocket.getOutputStream());
-                                        userSocketOut.writeUTF(msg);
+                                        userSocketOut.writeUTF(name +": "+ msg);
                                     }
                                 }
                             } catch (IOException e) {

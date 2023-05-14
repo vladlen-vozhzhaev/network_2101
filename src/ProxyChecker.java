@@ -1,6 +1,5 @@
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
 
 public class ProxyChecker {
     public static void main(String[] args) {
@@ -13,14 +12,20 @@ public class ProxyChecker {
             int i;
             String ipTmp = "";
             while ((i = fis.read()) != -1){
-                if(i == 13) continue;
-                else if (i == 10) {
+                if(i == 13) continue; // Возврат каретки
+                else if (i == 10) { // Перенос строки \n
                     //System.out.println(ipTmp);
                     String ip = ipTmp.split(":")[0];
                     String port = ipTmp.split(":")[1];
-                    System.out.println("IP: "+ip+", PORT: "+port);
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            checkProxy(ip, Integer.parseInt(port));
+                        }
+                    });
+                    thread.start();
                     ipTmp = "";
-                } else if (i == 9) {
+                } else if (i == 9) { // Табуляция
                     ipTmp += ":";
                 } else{
                     ipTmp += (char)i;
@@ -29,6 +34,22 @@ public class ProxyChecker {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public static void checkProxy(String ip, int port){
+        try {
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ip, port));
+            URL url = new URL("https://vozhzhaev.ru/test.php");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection(proxy);
+            InputStream is = connection.getInputStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+            String line;
+            /*while ((line = rd.readLine())!=null){
+                System.out.println(line);
+            }*/
+            System.out.println(ip+":"+port+" - РАБОТАЕТ!");
+        } catch (IOException e) {
+            System.out.println(ip+":"+port+" - не работает");
+        }
     }
 }
